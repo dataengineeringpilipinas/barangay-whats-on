@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+
+{% block title %}Add New Event - What's On in our Barangay{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-0">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Add New Event</h1>
+        <p class="text-gray-600">Share your event with the community and help everyone stay connected.</p>
+    </div>
+
+    <!-- Event Form -->
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <form id="event-form" class="space-y-6">
+                <!-- Event Title -->
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
+                        Event Title *
+                    </label>
+                    <input 
+                        type="text" 
+                        id="title" 
+                        name="title"
+                        required
+                        maxlength="200"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="e.g., Community Clean-up Drive"
+                    >
+                    <p class="mt-1 text-sm text-gray-500">Give your event a clear, descriptive title</p>
+                </div>
+
+                <!-- Event Description -->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                        Description *
+                    </label>
+                    <textarea 
+                        id="description" 
+                        name="description"
+                        required
+                        maxlength="1000"
+                        rows="4"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="Describe what the event is about, what participants can expect, and any important details..."
+                    ></textarea>
+                    <p class="mt-1 text-sm text-gray-500">Provide details about the event (max 1000 characters)</p>
+                </div>
+
+                <!-- Event Date and Time -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="event_date" class="block text-sm font-medium text-gray-700 mb-2">
+                            Date & Time *
+                        </label>
+                        <input 
+                            type="datetime-local" 
+                            id="event_date" 
+                            name="event_date"
+                            required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        >
+                        <p class="mt-1 text-sm text-gray-500">When will the event take place?</p>
+                    </div>
+
+                    <div>
+                        <label for="location" class="block text-sm font-medium text-gray-700 mb-2">
+                            Location *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="location" 
+                            name="location"
+                            required
+                            maxlength="200"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="e.g., Barangay Hall, Community Center"
+                        >
+                        <p class="mt-1 text-sm text-gray-500">Where will the event be held?</p>
+                    </div>
+                </div>
+
+                <!-- Organizer Information -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="organizer" class="block text-sm font-medium text-gray-700 mb-2">
+                            Organizer *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="organizer" 
+                            name="organizer"
+                            required
+                            maxlength="100"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="e.g., Barangay Council, Community Group"
+                        >
+                        <p class="mt-1 text-sm text-gray-500">Who is organizing this event?</p>
+                    </div>
+
+                    <div>
+                        <label for="contact_info" class="block text-sm font-medium text-gray-700 mb-2">
+                            Contact Information
+                        </label>
+                        <input 
+                            type="text" 
+                            id="contact_info" 
+                            name="contact_info"
+                            maxlength="100"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="e.g., 09123456789, email@example.com"
+                        >
+                        <p class="mt-1 text-sm text-gray-500">How can people contact you for more info?</p>
+                    </div>
+                </div>
+
+                <!-- Event Visibility -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                        Event Visibility
+                    </label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input 
+                                type="radio" 
+                                name="is_public" 
+                                value="true" 
+                                checked
+                                class="h-4 w-4 text-primary focus:ring-primary border-gray-300"
+                            >
+                            <span class="ml-2 text-sm text-gray-700">Public - Visible to everyone</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input 
+                                type="radio" 
+                                name="is_public" 
+                                value="false"
+                                class="h-4 w-4 text-primary focus:ring-primary border-gray-300"
+                            >
+                            <span class="ml-2 text-sm text-gray-700">Private - Limited visibility</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                    <button 
+                        type="submit"
+                        id="submit-btn"
+                        class="flex-1 bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <span id="submit-text">Create Event</span>
+                        <span id="submit-loading" class="hidden">
+                            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Creating...
+                        </span>
+                    </button>
+                    <a 
+                        href="/"
+                        class="flex-1 bg-white text-gray-700 border border-gray-300 px-6 py-3 rounded-md font-medium hover:bg-gray-50 transition-colors text-center"
+                    >
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Help Section -->
+        <div class="mt-8 bg-blue-50 rounded-lg p-6">
+            <h3 class="text-lg font-medium text-blue-900 mb-3">Tips for Great Events</h3>
+            <ul class="space-y-2 text-sm text-blue-800">
+                <li class="flex items-start">
+                    <svg class="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    Use clear, descriptive titles that tell people what the event is about
+                </li>
+                <li class="flex items-start">
+                    <svg class="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    Include all important details in the description
+                </li>
+                <li class="flex items-start">
+                    <svg class="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    Provide contact information so people can ask questions
+                </li>
+                <li class="flex items-start">
+                    <svg class="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    Set the event date and time accurately
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// API Client
+class ApiClient {
+    constructor(baseURL = '') {
+        this.baseURL = baseURL;
+    }
+
+    async request(endpoint, options = {}) {
+        try {
+            const response = await fetch(`${this.baseURL}${endpoint}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                },
+                ...options
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('API request failed:', error);
+            throw error;
+        }
+    }
+
+    async createEvent(eventData) {
+        return this.request('/api/v1/events/', {
+            method: 'POST',
+            body: JSON.stringify(eventData)
+        });
+    }
+}
+
+// Utility functions
+function showNotification(message, type = 'success') {
+    const container = document.getElementById('notification-container');
+    const notification = document.createElement('div');
+    
+    const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+    notification.className = `${bgColor} text-white px-4 py-2 rounded-md shadow-lg mb-2 transform transition-all duration-300 translate-x-full`;
+    notification.textContent = message;
+    
+    container.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Remove after 5 seconds
+    setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 5000);
+}
+
+function setFormLoading(loading) {
+    const submitBtn = document.getElementById('submit-btn');
+    const submitText = document.getElementById('submit-text');
+    const submitLoading = document.getElementById('submit-loading');
+    
+    if (loading) {
+        submitBtn.disabled = true;
+        submitText.classList.add('hidden');
+        submitLoading.classList.remove('hidden');
+    } else {
+        submitBtn.disabled = false;
+        submitText.classList.remove('hidden');
+        submitLoading.classList.add('hidden');
+    }
+}
+
+// Form validation
+function validateForm(formData) {
+    const errors = [];
+    
+    if (!formData.title.trim()) {
+        errors.push('Event title is required');
+    }
+    
+    if (!formData.description.trim()) {
+        errors.push('Event description is required');
+    }
+    
+    if (!formData.event_date) {
+        errors.push('Event date and time is required');
+    } else {
+        const eventDate = new Date(formData.event_date);
+        const now = new Date();
+        if (eventDate <= now) {
+            errors.push('Event date must be in the future');
+        }
+    }
+    
+    if (!formData.location.trim()) {
+        errors.push('Event location is required');
+    }
+    
+    if (!formData.organizer.trim()) {
+        errors.push('Event organizer is required');
+    }
+    
+    return errors;
+}
+
+// Initialize the page
+document.addEventListener('DOMContentLoaded', () => {
+    const apiClient = new ApiClient();
+    const form = document.getElementById('event-form');
+    const eventDateInput = document.getElementById('event_date');
+
+    // Set minimum date to today
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    
+    eventDateInput.min = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        const eventData = {
+            title: formData.get('title'),
+            description: formData.get('description'),
+            event_date: formData.get('event_date'),
+            location: formData.get('location'),
+            organizer: formData.get('organizer'),
+            contact_info: formData.get('contact_info') || null,
+            is_public: formData.get('is_public') === 'true'
+        };
+
+        // Validate form
+        const errors = validateForm(eventData);
+        if (errors.length > 0) {
+            showNotification(errors.join(', '), 'error');
+            return;
+        }
+
+        setFormLoading(true);
+
+        try {
+            await apiClient.createEvent(eventData);
+            showNotification('Event created successfully!', 'success');
+            
+            // Redirect to events page after a short delay
+            setTimeout(() => {
+                window.location.href = '/events';
+            }, 1500);
+            
+        } catch (error) {
+            console.error('Failed to create event:', error);
+            showNotification(error.message || 'Failed to create event. Please try again.', 'error');
+        } finally {
+            setFormLoading(false);
+        }
+    });
+
+    // Character counters
+    const titleInput = document.getElementById('title');
+    const descriptionInput = document.getElementById('description');
+    
+    function updateCharacterCount(input, maxLength) {
+        const remaining = maxLength - input.value.length;
+        const color = remaining < 50 ? 'text-red-500' : 'text-gray-500';
+        
+        let counter = input.parentNode.querySelector('.char-counter');
+        if (!counter) {
+            counter = document.createElement('div');
+            counter.className = 'char-counter text-sm mt-1';
+            input.parentNode.appendChild(counter);
+        }
+        
+        counter.className = `char-counter text-sm mt-1 ${color}`;
+        counter.textContent = `${remaining} characters remaining`;
+    }
+    
+    titleInput.addEventListener('input', () => updateCharacterCount(titleInput, 200));
+    descriptionInput.addEventListener('input', () => updateCharacterCount(descriptionInput, 1000));
+});
+</script>
+{% endblock %}

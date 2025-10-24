@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block title %}What's On in our Barangay? - Community Events{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-0">
+    <!-- Hero Section -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">
+            What's On in our Barangay?
+        </h1>
+        <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            Stay connected with your community! Discover upcoming events, meetings, and activities happening in our barangay.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="/events/new" class="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                Add New Event
+            </a>
+            <a href="/events" class="bg-white text-primary border border-primary px-6 py-3 rounded-lg font-medium hover:bg-blue-50 transition-colors">
+                View All Events
+            </a>
+        </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-4">Find Events</h2>
+        <div class="flex flex-col sm:flex-row gap-4">
+            <input 
+                type="text" 
+                id="search-input"
+                placeholder="Search events by title, description, or location..."
+                class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            >
+            <button 
+                id="search-btn"
+                class="bg-primary text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            >
+                Search
+            </button>
+        </div>
+    </div>
+
+    <!-- Upcoming Events Section -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-semibold text-gray-900">Upcoming Events</h2>
+            <a href="/events" class="text-primary hover:underline">View All</a>
+        </div>
+        
+        <div id="events-container" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <!-- Events will be loaded here -->
+            <div class="text-center py-8">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                <p class="mt-2 text-gray-500">Loading events...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow-md p-6 text-center">
+            <div class="text-3xl font-bold text-primary mb-2" id="total-events">-</div>
+            <div class="text-gray-600">Total Events</div>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6 text-center">
+            <div class="text-3xl font-bold text-accent mb-2" id="upcoming-events">-</div>
+            <div class="text-gray-600">Upcoming Events</div>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6 text-center">
+            <div class="text-3xl font-bold text-secondary mb-2" id="this-month">-</div>
+            <div class="text-gray-600">This Month</div>
+        </div>
+    </div>
+
+    <!-- Community Info -->
+    <div class="bg-gradient-to-r from-primary to-blue-600 rounded-lg shadow-md p-8 text-white">
+        <h2 class="text-2xl font-semibold mb-4">Join Our Community</h2>
+        <p class="text-blue-100 mb-6">
+            Be part of our vibrant barangay community! Stay informed about local events, 
+            meetings, and activities that bring us together.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4">
+            <a href="/events/new" class="bg-white text-primary px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+                Organize an Event
+            </a>
+            <a href="https://www.thepusoproject.ph/barangaydep" target="_blank" rel="noopener" class="border border-white text-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:text-primary transition-colors">
+                Learn More About Barangay DEP
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// API Client
+class ApiClient {
+    constructor(baseURL = '') {
+        this.baseURL = baseURL;
+    }
+
+    async request(endpoint, options = {}) {
+        try {
+            const response = await fetch(`${this.baseURL}${endpoint}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                },
+                ...options
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('API request failed:', error);
+            throw error;
+        }
+    }
+
+    async getUpcomingEvents(limit = 6) {
+        return this.request(`/api/v1/events/upcoming?limit=${limit}`);
+    }
+
+    async getAllEvents() {
+        return this.request('/api/v1/events?upcoming_only=false');
+    }
+
+    async searchEvents(query) {
+        return this.request(`/api/v1/events/search?q=${encodeURIComponent(query)}`);
+    }
+}
+
+// Utility functions
+function showNotification(message, type = 'success') {
+    const container = document.getElementById('notification-container');
+    const notification = document.createElement('div');
+    
+    const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+    notification.className = `${bgColor} text-white px-4 py-2 rounded-md shadow-lg mb-2 transform transition-all duration-300 translate-x-full`;
+    notification.textContent = message;
+    
+    container.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 3000);
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function createEventCard(event) {
+    return `
+        <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="text-lg font-semibold text-gray-900 line-clamp-2">${event.title}</h3>
+                    <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                        ${event.is_public ? 'Public' : 'Private'}
+                    </span>
+                </div>
+                <p class="text-gray-600 text-sm mb-4 line-clamp-3">${event.description}</p>
+                <div class="space-y-2 text-sm text-gray-500">
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        ${formatDate(event.event_date)}
+                    </div>
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        ${event.location}
+                    </div>
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        ${event.organizer}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Initialize the page
+document.addEventListener('DOMContentLoaded', async () => {
+    const apiClient = new ApiClient();
+    const eventsContainer = document.getElementById('events-container');
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+
+    // Load upcoming events
+    try {
+        const events = await apiClient.getUpcomingEvents(6);
+        
+        if (events.length === 0) {
+            eventsContainer.innerHTML = `
+                <div class="col-span-full text-center py-8">
+                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">No upcoming events</h3>
+                    <p class="text-gray-500 mb-4">Be the first to add an event to our community calendar!</p>
+                    <a href="/events/new" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                        Add Event
+                    </a>
+                </div>
+            `;
+        } else {
+            eventsContainer.innerHTML = events.map(createEventCard).join('');
+        }
+
+        // Update stats
+        const allEvents = await apiClient.getAllEvents();
+        const upcomingCount = events.length;
+        const thisMonth = events.filter(event => {
+            const eventDate = new Date(event.event_date);
+            const now = new Date();
+            return eventDate.getMonth() === now.getMonth() && eventDate.getFullYear() === now.getFullYear();
+        }).length;
+
+        document.getElementById('total-events').textContent = allEvents.length;
+        document.getElementById('upcoming-events').textContent = upcomingCount;
+        document.getElementById('this-month').textContent = thisMonth;
+
+    } catch (error) {
+        console.error('Failed to load events:', error);
+        eventsContainer.innerHTML = `
+            <div class="col-span-full text-center py-8">
+                <p class="text-red-500">Failed to load events. Please try again later.</p>
+            </div>
+        `;
+    }
+
+    // Search functionality
+    searchBtn.addEventListener('click', async () => {
+        const query = searchInput.value.trim();
+        if (!query) return;
+
+        try {
+            const results = await apiClient.searchEvents(query);
+            
+            if (results.length === 0) {
+                eventsContainer.innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <p class="text-gray-500">No events found for "${query}"</p>
+                    </div>
+                `;
+            } else {
+                eventsContainer.innerHTML = results.map(createEventCard).join('');
+            }
+        } catch (error) {
+            console.error('Search failed:', error);
+            showNotification('Search failed. Please try again.', 'error');
+        }
+    });
+
+    // Search on Enter key
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            searchBtn.click();
+        }
+    });
+});
+</script>
+{% endblock %}
